@@ -14,12 +14,6 @@
 // transitions amount T
 // T lines of: src_state dest_state probability
 
-namespace {
-    HMM::Probability_t to_neg_log(HMM::Probability_t prob) {
-        return -1 * std::log2f(prob);
-    }
-}
-
 
 HMM read_HMM(const std::string& HMM_file_name) {
     auto file = std::ifstream(HMM_file_name);
@@ -37,7 +31,7 @@ HMM read_HMM(const std::string& HMM_file_name) {
 
     for (size_t i = 0; i < hmm.states_num; ++i) {
         file >> prob_from_file;
-        prob_from_file = to_neg_log(prob_from_file);
+        prob_from_file = HMM::to_neg_log(prob_from_file);
         hmm.start_probabilities.push_back(prob_from_file);
     }
 
@@ -47,7 +41,7 @@ HMM read_HMM(const std::string& HMM_file_name) {
 
     for (size_t i = 0; i < hmm.emit_num * hmm.states_num; ++i) {
         file >> prob_from_file;
-        prob_from_file = to_neg_log(prob_from_file);
+        prob_from_file = HMM::to_neg_log(prob_from_file);
         hmm.emissions.push_back(prob_from_file);
     }
 
@@ -63,7 +57,7 @@ HMM read_HMM(const std::string& HMM_file_name) {
     auto dst = size_t(0);
     for (size_t i = 0; i < hmm.trans_num; ++i) {
         file >> src >> dst >> prob_from_file;
-        prob_from_file = to_neg_log(prob_from_file);
+        prob_from_file = HMM::to_neg_log(prob_from_file);
         hmm.trans_rows.push_back(src);
         hmm.trans_cols.push_back(dst);
         hmm.trans_probs.push_back(prob_from_file);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 class HMM {
@@ -17,4 +18,14 @@ class HMM {
     std::vector<Probability_t> trans_probs;
     std::vector<Probability_t> emissions;
     std::vector<Probability_t> start_probabilities;
+
+    // Functions to work with Probability_t
+
+    static bool almost_equal(HMM::Probability_t x, HMM::Probability_t y) {
+        return std::fabs(x - y) <= 0.0001;
+    }
+
+    static HMM::Probability_t to_neg_log(HMM::Probability_t x) {
+        return -1 * std::log2(x);
+    }
 };

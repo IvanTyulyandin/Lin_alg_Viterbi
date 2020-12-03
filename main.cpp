@@ -1,15 +1,7 @@
-#include <iostream>
-#include <limits>
-#include <cmath>
-
 #include "HMM_reader.h"
 #include "LA_Viterbi.h"
 
-
-template <class T>
-typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_equal(T x, T y) {
-    return std::fabs(x - y) <= 0.0001;
-}
+#include <iostream>
 
 
 int main() {
@@ -25,12 +17,12 @@ int main() {
     Viterbi_impl.run_Viterbi(hmm, seq);
     auto prob = HMM::Probability_t(0);
     GrB_Matrix_extractElement_FP32(&prob, Viterbi_impl.result,  0, 0);
-    if (!almost_equal(prob, float(25.6574))) {
+    if (!HMM::almost_equal(prob, float(25.6574))) {
         std::cerr << "Wrong (0,0) or result probabilities!\n"
             << "(0,0) is " << prob << '\n';
     }
     GrB_Matrix_extractElement_FP32(&prob, Viterbi_impl.result, 1, 0);
-    if (!almost_equal(prob, float(24.4874))) {
+    if (!HMM::almost_equal(prob, float(24.4874))) {
         std::cerr << "Wrong (0,1) or result probabilities!\n"
             << "(1,0) is " << prob << '\n';
     }
