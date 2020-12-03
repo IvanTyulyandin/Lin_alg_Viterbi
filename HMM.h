@@ -1,9 +1,12 @@
+#pragma once
+
 #include <vector>
 
 class HMM {
   public:
     using Probability_t = float;
     using Index_t = size_t;
+    using Emit_t = size_t;
 
     Index_t states_num;
     Index_t emit_num;
