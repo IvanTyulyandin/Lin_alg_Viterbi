@@ -2,8 +2,10 @@
 #include "../data_reader.h"
 
 #include <iostream>
+
+
 int main() {
-    auto hmm = read_HMM("../CHMM_data/example.CHMM");
+    auto hmm = read_HMM("../chmm_files/test_chmm.chmm");
     auto seq = read_emit_seq("../ess_files/test_seq.ess")[0];
 
     auto Viterbi_impl = LA_Viterbi();

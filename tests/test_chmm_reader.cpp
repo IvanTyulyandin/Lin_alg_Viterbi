@@ -2,7 +2,7 @@
 
 
 int main() {
-    auto hmm = read_HMM("../CHMM_data/example.CHMM");
+    auto hmm = read_HMM("../chmm_files/test_chmm.chmm");
     auto is_test_passed = (
         hmm.states_num == 2 &&
         HMM::almost_equal(hmm.start_probabilities[0], HMM::to_neg_log(0.5)) &&

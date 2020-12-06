@@ -22,8 +22,8 @@ target_link_libraries(Lin_alg_Viterbi LA_Viterbi)
 enable_testing()
 add_subdirectory(tests)
 
-file(GLOB CHMM_DATA ${CMAKE_CURRENT_SOURCE_DIR}/CHMM_data/*.CHMM)
-file(COPY ${CHMM_DATA} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/CHMM_data/)
+file(GLOB CHMM_DATA ${CMAKE_CURRENT_SOURCE_DIR}/chmm_files/*.chmm)
+file(COPY ${CHMM_DATA} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/chmm_files/)
 
 file(GLOB ESS_DATA ${CMAKE_CURRENT_SOURCE_DIR}/ess_files/*.ess)
 file(COPY ${ESS_DATA} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ess_files/)

@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 project(tests)
 
-add_executable(test_HMM_reader test_HMM_reader.cpp)
-target_link_libraries(test_HMM_reader LA_Viterbi)
+add_executable(test_chmm_reader test_chmm_reader.cpp)
+target_link_libraries(test_chmm_reader LA_Viterbi)
 
-add_test(test_HMM_reader test_HMM_reader)
+add_test(test_chmm_reader test_chmm_reader)
 
 add_executable(test_LA_Viterbi test_LA_Viterbi.cpp)
 target_link_libraries(test_LA_Viterbi LA_Viterbi)
