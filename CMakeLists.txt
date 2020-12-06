@@ -7,7 +7,7 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-function -Wno-u
 # Build main part
 set(LA_VITERBI_SRC
     HMM.h
-    HMM_reader.h HMM_reader.cpp
+    data_reader.h data_reader.cpp
     LA_Viterbi.h LA_Viterbi.cpp)
 add_library(LA_Viterbi ${LA_VITERBI_SRC})
 
@@ -20,7 +20,10 @@ target_link_libraries(Lin_alg_Viterbi LA_Viterbi)
 
 # Build tests
 enable_testing()
-
 add_subdirectory(tests)
-file(GLOB TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR}/CHMM_data/*.CHMM)
-file(COPY ${TEST_DATA} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/CHMM_data/)
+
+file(GLOB CHMM_DATA ${CMAKE_CURRENT_SOURCE_DIR}/CHMM_data/*.CHMM)
+file(COPY ${CHMM_DATA} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/CHMM_data/)
+
+file(GLOB ESS_DATA ${CMAKE_CURRENT_SOURCE_DIR}/ess_files/*.ess)
+file(COPY ${ESS_DATA} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ess_files/)

@@ -1,4 +1,4 @@
-#include "HMM_reader.h"
+#include "data_reader.h"
 
 #include <cmath>
 #include <iostream>
@@ -65,4 +65,62 @@ HMM read_HMM(const std::string& HMM_file_name) {
 
     file.close();
     return hmm;
+}
+
+
+// ess format
+// Notes:
+//   sequence[_] can be stored at many lines;
+//   line with number and lenght should be stored at separate line;
+//
+// Number of sequences N
+// 0 length(sequence[0])
+// sequence[0]
+// ...
+// N-1 length(sequence[N-1])
+// sequence[N-1]
+
+
+std::vector<HMM::Emit_vec_t> read_emit_seq(const std::string& emit_seq_file_name) {
+    auto file = std::ifstream(emit_seq_file_name);
+    if (file.fail()) {
+        std::cerr << "Failed to open file with emitted sequences: "
+            << emit_seq_file_name << '\n';
+        return {};
+    }
+
+    auto num_of_sequences = size_t(0);
+    file >> num_of_sequences;
+
+    auto emitted_sequences = std::vector<HMM::Emit_vec_t>();
+    emitted_sequences.reserve(num_of_sequences);
+
+    auto cur_seq = HMM::Emit_vec_t();
+    auto cur_seq_num = size_t(0);
+    auto cur_seq_len = size_t(0);
+    auto cur_emit = HMM::Emit_t(0);
+
+    for (size_t i = 0; i < num_of_sequences; ++i) {
+        file >> cur_seq_num;
+        if (cur_seq_num != i) {
+            std::cerr << "Error in .ess file " << emit_seq_file_name
+                << ": expected sequence number is " << i
+                << ", but read " << cur_seq_num << '\n';
+            file.close();
+            return {};
+        }
+
+        file >> cur_seq_len;
+        cur_seq.clear();
+        cur_seq.reserve(cur_seq_len);
+
+        for (size_t j = 0; j < cur_seq_len; ++j) {
+            file >> cur_emit;
+            cur_seq.push_back(cur_emit);
+        }
+        emitted_sequences.push_back(std::move(cur_seq));
+    }
+
+    file.close();
+    return emitted_sequences;
 }

@@ -1,4 +1,4 @@
-#include "../HMM_reader.h"
+#include "../data_reader.h"
 
 
 int main() {

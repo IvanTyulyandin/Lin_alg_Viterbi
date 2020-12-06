@@ -1,4 +1,4 @@
-#include "HMM_reader.h"
+#include "data_reader.h"
 #include "LA_Viterbi.h"
 
 #include <iostream>

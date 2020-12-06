@@ -1,13 +1,10 @@
 #include "../LA_Viterbi.h"
-#include "../HMM_reader.h"
+#include "../data_reader.h"
 
 #include <iostream>
 int main() {
     auto hmm = read_HMM("../CHMM_data/example.CHMM");
-    // Define sequence to examine
-    // GGCACTGAA
-    // A = 0, C = 1, G = 2, T = 3
-    auto seq = HMM::Emit_vec_t{2,2,1,0,1,3,2,0,0};
+    auto seq = read_emit_seq("../ess_files/test_seq.ess")[0];
 
     auto Viterbi_impl = LA_Viterbi();
     Viterbi_impl.run_Viterbi(hmm, seq);
