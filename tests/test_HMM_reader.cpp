@@ -17,8 +17,8 @@ int main() {
         HMM::almost_equal(hmm.emissions[6], HMM::to_neg_log(0.2)) &&
         HMM::almost_equal(hmm.emissions[7], HMM::to_neg_log(0.3)) &&
         hmm.trans_num == 4 &&
-        hmm.trans_rows == std::vector<HMM::Index_t>{0, 0, 1, 1} &&
-        hmm.trans_cols == std::vector<HMM::Index_t>{0, 1, 0, 1} &&
+        hmm.trans_rows == HMM::Index_vec_t{0, 0, 1, 1} &&
+        hmm.trans_cols == HMM::Index_vec_t{0, 1, 0, 1} &&
         HMM::almost_equal(hmm.trans_probs[0], HMM::to_neg_log(0.5)) &&
         HMM::almost_equal(hmm.trans_probs[1], HMM::to_neg_log(0.5)) &&
         HMM::almost_equal(hmm.trans_probs[2], HMM::to_neg_log(0.4)) &&

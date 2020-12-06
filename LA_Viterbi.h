@@ -13,7 +13,7 @@ class LA_Viterbi {
     GrB_Matrix result;
 
     // Writes possible probabilities of seq to result
-    void run_Viterbi(HMM& hmm, std::vector<HMM::Emit_t> seq);
+    void run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq);
 
     ~LA_Viterbi();
 };

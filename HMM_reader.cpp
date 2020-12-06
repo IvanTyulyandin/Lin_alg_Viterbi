@@ -48,9 +48,9 @@ HMM read_HMM(const std::string& HMM_file_name) {
     // Read graph edges info as triples:
     // source_state destination_state transition_probability
     file >> hmm.trans_num;
-    hmm.trans_rows = std::vector<HMM::Index_t>();
+    hmm.trans_rows = HMM::Index_vec_t();
     hmm.trans_rows.reserve(hmm.trans_num);
-    hmm.trans_cols = std::vector<HMM::Index_t>();
+    hmm.trans_cols = HMM::Index_vec_t();
     hmm.trans_cols.reserve(hmm.trans_num);
 
     auto src = size_t(0);

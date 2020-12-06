@@ -8,16 +8,19 @@ class HMM {
     using Probability_t = float;
     using Index_t = size_t;
     using Emit_t = size_t;
+    using Prob_vec_t = std::vector<Probability_t>;
+    using Index_vec_t = std::vector<Index_t>;
+    using Emit_vec_t = std::vector<Emit_t>;
 
     Index_t states_num;
     Index_t emit_num;
     Index_t trans_num;
     // encode states and emit symbols as numbers
-    std::vector<Index_t> trans_rows;
-    std::vector<Index_t> trans_cols;
-    std::vector<Probability_t> trans_probs;
-    std::vector<Probability_t> emissions;
-    std::vector<Probability_t> start_probabilities;
+    Index_vec_t trans_rows;
+    Index_vec_t trans_cols;
+    Prob_vec_t trans_probs;
+    Prob_vec_t emissions;
+    Prob_vec_t start_probabilities;
 
     // Functions to work with Probability_t
 

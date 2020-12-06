@@ -7,7 +7,7 @@ int main() {
     // Define sequence to examine
     // GGCACTGAA
     // A = 0, C = 1, G = 2, T = 3
-    auto seq = std::vector<HMM::Emit_t>{2,2,1,0,1,3,2,0,0};
+    auto seq = HMM::Emit_vec_t{2,2,1,0,1,3,2,0,0};
 
     auto Viterbi_impl = LA_Viterbi();
     Viterbi_impl.run_Viterbi(hmm, seq);

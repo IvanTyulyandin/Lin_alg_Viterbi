@@ -17,7 +17,7 @@ LA_Viterbi::LA_Viterbi() {
 }
 
 
-void LA_Viterbi::run_Viterbi(HMM& hmm, std::vector<HMM::Emit_t> seq) {
+void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
     // Define GraphBLAS matrices
 
     // Prepare result to store data about start/current probabilities
@@ -41,7 +41,7 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, std::vector<HMM::Emit_t> seq) {
     // Emission probabilities matrices
     auto em_probs = std::vector<GrB_Matrix>(hmm.emit_num);
     auto emit_ind = std::vector<GrB_Index>(hmm.states_num);
-    auto emit_data = std::vector<HMM::Probability_t>(hmm.states_num);
+    auto emit_data = HMM::Prob_vec_t(hmm.states_num);
 
     // Diagonal matrix indicies
     for (size_t i = 0; i < hmm.states_num; ++i) {
