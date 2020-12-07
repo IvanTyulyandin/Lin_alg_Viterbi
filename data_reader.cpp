@@ -8,11 +8,12 @@
 // HMM format
 //
 // HMM states amount N
-// N starting probabilities at one string
-// emit symbols amount M
-// N strings with M probabilities
-// transitions amount T
-// T lines of: src_state dest_state probability
+// S — number of states with non zero start probability
+// S strings of: "state start_probability"
+// E — emit symbols amount
+// N strings with E probabilities
+// T — transitions amount
+// T strings of: "src_state dest_state probability"
 
 
 HMM read_HMM(const std::string& HMM_file_name) {
@@ -25,14 +26,19 @@ HMM read_HMM(const std::string& HMM_file_name) {
     auto hmm = HMM{};
     auto prob_from_file = HMM::Probability_t(0);
 
-    // Read number of states and probabilities to be start state
+    // Read number of states
     file >> hmm.states_num;
-    hmm.start_probabilities.reserve(hmm.states_num);
+    hmm.start_probabilities = HMM::Prob_vec_t(hmm.states_num, 0.0);
 
-    for (size_t i = 0; i < hmm.states_num; ++i) {
-        file >> prob_from_file;
+    // Read states with non zero probability to be start/
+    auto state_ind = HMM::Index_t(0);
+    auto non_zero_start_prob_num = HMM::Index_t(0);
+    file >> non_zero_start_prob_num;
+
+    for (size_t i = 0; i < non_zero_start_prob_num; ++i) {
+        file >> state_ind >> prob_from_file;
         prob_from_file = HMM::to_neg_log(prob_from_file);
-        hmm.start_probabilities.push_back(prob_from_file);
+        hmm.start_probabilities[state_ind] = prob_from_file;
     }
 
     // Read info about emission symbols
