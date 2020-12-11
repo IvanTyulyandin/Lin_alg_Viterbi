@@ -8,7 +8,8 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-function -Wno-u
 set(LA_VITERBI_SRC
     HMM.h
     data_reader.h data_reader.cpp
-    LA_Viterbi.h LA_Viterbi.cpp)
+    LA_Viterbi.h LA_Viterbi.cpp
+    LA_Viterbi_spec.h LA_Viterbi_spec.cpp)
 add_library(LA_Viterbi ${LA_VITERBI_SRC})
 
 find_package(OpenMP REQUIRED)
