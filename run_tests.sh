@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd cmake_build
-ctest
+ctest --verbose -D ExperimentalMemCheck .
 cd ..

@@ -20,6 +20,7 @@ add_executable(Lin_alg_Viterbi main.cpp)
 target_link_libraries(Lin_alg_Viterbi LA_Viterbi)
 
 # Build tests
+include(CTest)
 enable_testing()
 add_subdirectory(tests)
 
