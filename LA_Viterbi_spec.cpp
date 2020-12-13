@@ -98,12 +98,14 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
     }
 
     GrB_Matrix_free(&transitions);
+    GrB_Matrix_free(&start_probs);
     GrB_Matrix_free(&emit_probs_diag_mat);
 }
 
 
 void LA_Viterbi_spec::run_Viterbi_spec(const HMM::Emit_vec_t& seq) {
-    auto info = GrB_Matrix_clear(result);
+    // Clear previous stored result
+    auto info = GrB_Matrix_free(&result);
     check_for_error(info);
 
     // Start Viterbi algorithm for seq[0]
