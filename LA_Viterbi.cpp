@@ -1,18 +1,7 @@
 #include "LA_Viterbi.h"
 
-namespace {
-    void check_for_error(const GrB_Info& info) {
-        if (! (info == GrB_Info::GrB_SUCCESS || info == GrB_Info::GrB_NO_VALUE)) {
-            printf("info: %d error: %s\n", info, GrB_error());
-        }
-    }
-}
-
 
 LA_Viterbi::LA_Viterbi() {
-    // Init GraphBLAS
-    auto info = GrB_init(GrB_Mode::GrB_NONBLOCKING);
-    check_for_error(info);
     result = GrB_Matrix();
 }
 
@@ -68,11 +57,10 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
         check_for_error(info);
     }
 
-    // Transposed transition matrix
-    (hmm.trans_rows).swap(hmm.trans_cols);
+    hmm.transpose_transitions();
 
     auto transitions = GrB_Matrix();
-    info = GrB_Matrix_new(&transitions, GrB_FP32, 2, 2);
+    info = GrB_Matrix_new(&transitions, GrB_FP32, hmm.states_num, hmm.states_num);
     check_for_error(info);
 
     info = GrB_Matrix_build_FP32(
@@ -115,8 +103,9 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
 
     // Print matrix
     // SuiteSPARSE-specific (since GxB, not GrB)
-    info = GxB_Matrix_fprint(result, "current_probabilities", GxB_COMPLETE, stdout);
-    check_for_error(info);
+    //
+    // info = GxB_Matrix_fprint(result, "current_probabilities", GxB_COMPLETE, stdout);
+    // check_for_error(info);
 
     // Free resources
     for (auto& m : em_probs) {
@@ -133,7 +122,4 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
 
 LA_Viterbi::~LA_Viterbi() {
     GrB_Matrix_free(&result);
-    // Finalize GraphBLAS
-    auto info = GrB_finalize();
-    check_for_error(info);
 }

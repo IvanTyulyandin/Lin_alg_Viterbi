@@ -6,7 +6,8 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-function -Wno-u
 
 # Build main part
 set(LA_VITERBI_SRC
-    HMM.h
+    HMM.h 
+    GraphBLAS_manager.h GraphBLAS_manager.cpp
     data_reader.h data_reader.cpp
     LA_Viterbi.h LA_Viterbi.cpp
     LA_Viterbi_spec.h LA_Viterbi_spec.cpp)
@@ -16,8 +17,8 @@ find_package(OpenMP REQUIRED)
 target_link_libraries(LA_Viterbi graphblas OpenMP::OpenMP_CXX)
 
 # Build executable that can be used for demonstration/benchmarking/etc
-add_executable(Lin_alg_Viterbi main.cpp)
-target_link_libraries(Lin_alg_Viterbi LA_Viterbi)
+add_executable(Lin_alg_Viterbi main.cpp benchmark_helper.h)
+target_link_libraries(Lin_alg_Viterbi LA_Viterbi stdc++fs)
 
 # Build tests
 include(CTest)

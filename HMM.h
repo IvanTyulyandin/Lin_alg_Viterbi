@@ -11,6 +11,7 @@ class HMM {
     using Prob_vec_t = std::vector<Probability_t>;
     using Index_vec_t = std::vector<Index_t>;
     using Emit_vec_t = std::vector<Emit_t>;
+    using Seq_vec_t = std::vector<Emit_vec_t>;
 
     Index_t states_num;
     Index_t emit_num;
@@ -31,4 +32,14 @@ class HMM {
     static HMM::Probability_t to_neg_log(HMM::Probability_t x) {
         return -1 * std::log2(x);
     }
+
+    void transpose_transitions() {
+        if (! is_transition_transposed) {
+            is_transition_transposed = true;
+            trans_rows.swap(trans_cols);
+        }
+    }
+
+  private:
+    bool is_transition_transposed = false;
 };

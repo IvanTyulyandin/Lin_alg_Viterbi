@@ -87,7 +87,7 @@ HMM read_HMM(const std::string& HMM_file_name) {
 // sequence[N-1]
 
 
-std::vector<HMM::Emit_vec_t> read_emit_seq(const std::string& emit_seq_file_name) {
+HMM::Seq_vec_t read_emit_seq(const std::string& emit_seq_file_name) {
     auto file = std::ifstream(emit_seq_file_name);
     if (file.fail()) {
         std::cerr << "Failed to open file with emitted sequences: "
@@ -98,7 +98,7 @@ std::vector<HMM::Emit_vec_t> read_emit_seq(const std::string& emit_seq_file_name
     auto num_of_sequences = size_t(0);
     file >> num_of_sequences;
 
-    auto emitted_sequences = std::vector<HMM::Emit_vec_t>();
+    auto emitted_sequences = HMM::Seq_vec_t();
     emitted_sequences.reserve(num_of_sequences);
 
     auto cur_seq = HMM::Emit_vec_t();

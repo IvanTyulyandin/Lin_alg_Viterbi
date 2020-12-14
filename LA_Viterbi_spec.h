@@ -1,10 +1,7 @@
 #pragma once
 
 #include "HMM.h"
-
-extern "C" {
-    #include <GraphBLAS.h>
-}
+#include "GraphBLAS_manager.h"
 
 class LA_Viterbi_spec {
   public:

@@ -5,6 +5,9 @@
 
 
 int main() {
+
+    launch_GraphBLAS();
+
     auto hmm = read_HMM("../chmm_files/test_chmm.chmm");
     auto seq = read_emit_seq("../ess_files/test_seq.ess")[0];
 
@@ -22,5 +25,8 @@ int main() {
         HMM::almost_equal(prob_0, HMM::Probability_t(25.6574)) &&
         HMM::almost_equal(prob_1, HMM::Probability_t(24.4874));
     std::cerr << prob_0 << ' ' << prob_1 << '\n';
+
+    stop_GraphBLAS();
+
     return 1 - static_cast<int>(is_test_passed);
 }

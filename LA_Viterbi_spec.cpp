@@ -1,32 +1,21 @@
 #include "LA_Viterbi_spec.h"
 
 #include "data_reader.h"
-
-namespace {
-    void check_for_error(const GrB_Info& info) {
-        if (! (info == GrB_Info::GrB_SUCCESS || info == GrB_Info::GrB_NO_VALUE)) {
-            printf("info: %d error: %s\n", info, GrB_error());
-        }
-    }
-}
+#include <iostream>
 
 
 LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
-    // Init GraphBLAS
-    auto info = GrB_init(GrB_Mode::GrB_NONBLOCKING);
-    check_for_error(info);
-
     auto hmm = read_HMM(chmm_file_path);
     states_num = hmm.states_num;
+
     result = GrB_Matrix();
-    info = GrB_Matrix_new(&result, GrB_FP32, states_num, 1);
+    auto info = GrB_Matrix_new(&result, GrB_FP32, states_num, 1);
     check_for_error(info);
 
-    // Transposed transition matrix
-    (hmm.trans_rows).swap(hmm.trans_cols);
+    hmm.transpose_transitions();
 
     auto transitions = GrB_Matrix();
-    info = GrB_Matrix_new(&transitions, GrB_FP32, 2, 2);
+    info = GrB_Matrix_new(&transitions, GrB_FP32, states_num, states_num);
     check_for_error(info);
 
     info = GrB_Matrix_build_FP32(
@@ -140,8 +129,4 @@ LA_Viterbi_spec::~LA_Viterbi_spec() {
         GrB_Matrix_free(&m);
     }
     GrB_Matrix_free(&result);
-
-    // Finalize GraphBLAS
-    auto info = GrB_finalize();
-    check_for_error(info);
 }
