@@ -110,7 +110,7 @@ void LA_Viterbi_spec::run_Viterbi_spec(const HMM::Emit_vec_t& seq) {
             next_probs, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
             emit_pr_x_trans_pr[seq[i]], result, GrB_NULL);
         check_for_error(info);
-
+        GrB_Matrix_wait(&next_probs);
         std::swap(next_probs, result);
     }
 

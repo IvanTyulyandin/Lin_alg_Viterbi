@@ -79,6 +79,7 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
         next_probabilites, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
         em_probs[seq[0]], result, GrB_NULL);
     check_for_error(info);
+    GrB_Matrix_wait(&next_probabilites);
     std::swap(result, next_probabilites);
 
     for (size_t i = 1; i < seq.size(); ++i) {
@@ -86,11 +87,13 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
             prob_x_trans, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
             em_probs[seq[i]], transitions, GrB_NULL);
         check_for_error(info);
+        GrB_Matrix_wait(&prob_x_trans);
 
         info = GrB_mxm(
             next_probabilites, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
             prob_x_trans, result, GrB_NULL);
         check_for_error(info);
+        GrB_Matrix_wait(&next_probabilites);
 
         std::swap(result, next_probabilites);
     }
