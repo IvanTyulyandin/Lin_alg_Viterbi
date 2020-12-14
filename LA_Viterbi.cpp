@@ -6,7 +6,7 @@ LA_Viterbi::LA_Viterbi() {
 }
 
 
-void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
+void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
     // Define GraphBLAS matrices
 
     // Prepare result to store data about start/current probabilities
@@ -15,27 +15,21 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
     auto info = GrB_Matrix_new(&result, GrB_FP32, hmm.states_num, 1);
     check_for_error(info);
 
-    auto cur_probs_rows_ind = std::vector<GrB_Index>();
-    cur_probs_rows_ind.reserve(hmm.states_num);
-    auto cur_probs_cols_ind = std::vector<GrB_Index>(hmm.states_num, 0);
+    auto n_zeroes_ind = std::vector<GrB_Index>(hmm.states_num, 0);
+    auto from_0_to_n_ind = std::vector<GrB_Index>(hmm.states_num);
     for (size_t i = 0; i < hmm.states_num; ++i) {
-        cur_probs_rows_ind.push_back(i);
+        from_0_to_n_ind[i] = i;
     }
+
     info = GrB_Matrix_build_FP32(result,
-        cur_probs_rows_ind.data(), cur_probs_cols_ind.data(), hmm.start_probabilities.data(),
+        from_0_to_n_ind.data(), n_zeroes_ind.data(), hmm.start_probabilities.data(),
         hmm.states_num,
         GrB_FIRST_FP32);
     check_for_error(info);
 
     // Emission probabilities matrices
     auto em_probs = std::vector<GrB_Matrix>(hmm.emit_num);
-    auto emit_ind = std::vector<GrB_Index>(hmm.states_num);
     auto emit_data = HMM::Prob_vec_t(hmm.states_num);
-
-    // Diagonal matrix indicies
-    for (size_t i = 0; i < hmm.states_num; ++i) {
-        emit_ind[i] = i;
-    }
 
     for (size_t i = 0; i < hmm.emit_num; ++i) {
         auto& m = em_probs[i];
@@ -51,7 +45,7 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, HMM::Emit_vec_t seq) {
 
         info = GrB_Matrix_build_FP32(
             m,
-            emit_ind.data(), emit_ind.data(), emit_data.data(),
+            from_0_to_n_ind.data(), from_0_to_n_ind.data(), emit_data.data(),
             hmm.states_num,
             GrB_FIRST_FP32);
         check_for_error(info);
