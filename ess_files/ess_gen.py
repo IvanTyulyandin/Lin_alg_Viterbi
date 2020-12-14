@@ -10,6 +10,7 @@ len_per_line: int = 100
 
 # Generation
 with open(file_name, 'w') as f:
+    f.write(how_much_to_gen)
     for i in range(how_much_to_gen):
         f.write(str(i) + ' ' + str(seq_size) + '\n')
         random_seq: list = []
