@@ -2,7 +2,7 @@ import random
 
 # Parameters
 how_much_to_gen: int = 3
-seq_size: int = 3500
+seq_size: int = 7000
 emit_range: int = 20
 file_name: str = "emit_" + str(how_much_to_gen) + \
     "_" + str(seq_size) + "_" + str(emit_range) + ".ess"
