@@ -1,7 +1,7 @@
 import random
 
 # Parameters
-states_num: int = 100
+states_num: int = 900
 trans_per_state: int = 3
 transitions_num: int = trans_per_state * states_num
 num_non_zero_start_probs: int = 2
