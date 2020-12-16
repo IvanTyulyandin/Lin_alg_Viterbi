@@ -33,13 +33,15 @@ std::chrono::milliseconds benchmark_spec_N_times(
     auto spec_impl = LA_Viterbi_spec(chmm_path);
 
     for (size_t i = 0; i < N; ++i) {
-        auto cur_iter_time = std::chrono::milliseconds{0};
+        auto iteration_start_time = std::chrono::steady_clock::now();
 
         for (const auto& seq : ess) {
             spec_impl.run_Viterbi_spec(seq);
         }
 
-        best_time = std::min(best_time, cur_iter_time);
+        auto cur_time = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
+        best_time = std::min(best_time, duration);
     }
 
     std::cout << chmm_path << ": best time is " << best_time.count()
@@ -59,13 +61,15 @@ std::chrono::milliseconds benchmark_non_spec_N_times(
     auto non_spec_impl = LA_Viterbi();
 
     for (size_t i = 0; i < N; ++i) {
-        auto cur_iter_time = std::chrono::milliseconds{0};
+        auto iteration_start_time = std::chrono::steady_clock::now();
 
         for (const auto& seq : ess) {
             non_spec_impl.run_Viterbi(hmm, seq);
         }
 
-        best_time = std::min(best_time, cur_iter_time);
+        auto cur_time = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
+        best_time = std::min(best_time, duration);
     }
 
     std::cout << chmm_path << ": best time is " << best_time.count()
