@@ -1,33 +1,29 @@
-#include "data_reader.h"
 #include "LA_Viterbi.h"
 #include "LA_Viterbi_spec.h"
+#include "data_reader.h"
 
-#include <iostream>
+#include <any>
 #include <chrono>
 #include <experimental/filesystem>
-#include <any>
-
+#include <iostream>
 
 enum class Algorithm_selector { LA, LA_spec };
 
 namespace {
-    constexpr std::string_view get_algo_descr(Algorithm_selector alg_sel) {
-        if (alg_sel == Algorithm_selector::LA) {
-            return "non-specialized version";
-        } else if (alg_sel == Algorithm_selector::LA_spec) {
-            return "specialized version";
-        } else {
-            return "Error! Unknown Algorithm_selector";
-        }
+constexpr std::string_view get_algo_descr(Algorithm_selector alg_sel) {
+    if (alg_sel == Algorithm_selector::LA) {
+        return "non-specialized version";
+    } else if (alg_sel == Algorithm_selector::LA_spec) {
+        return "specialized version";
+    } else {
+        return "Error! Unknown Algorithm_selector";
     }
 }
+} // namespace
 
-
-template<int N>
-std::chrono::milliseconds benchmark_spec_N_times(
-    const std::string& chmm_path,
-    const HMM::Seq_vec_t ess)
-{
+template <int N>
+std::chrono::milliseconds benchmark_spec_N_times(const std::string& chmm_path,
+                                                 const HMM::Seq_vec_t ess) {
     auto best_time = std::chrono::milliseconds::max();
 
     auto spec_impl = LA_Viterbi_spec(chmm_path);
@@ -40,21 +36,19 @@ std::chrono::milliseconds benchmark_spec_N_times(
         }
 
         auto cur_time = std::chrono::steady_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
+        auto duration =
+            std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
         best_time = std::min(best_time, duration);
     }
 
-    std::cout << chmm_path << ": best time is " << best_time.count()
-        << " msec from " << N << " times\n";
+    std::cout << chmm_path << ": best time is " << best_time.count() << " msec from " << N
+              << " times\n";
     return best_time;
 }
 
-
-template<int N>
-std::chrono::milliseconds benchmark_non_spec_N_times(
-    const std::string& chmm_path,
-    const HMM::Seq_vec_t ess)
-{
+template <int N>
+std::chrono::milliseconds benchmark_non_spec_N_times(const std::string& chmm_path,
+                                                     const HMM::Seq_vec_t ess) {
     auto best_time = std::chrono::milliseconds::max();
 
     auto hmm = read_HMM(chmm_path);
@@ -68,26 +62,22 @@ std::chrono::milliseconds benchmark_non_spec_N_times(
         }
 
         auto cur_time = std::chrono::steady_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
+        auto duration =
+            std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
         best_time = std::min(best_time, duration);
     }
 
-    std::cout << chmm_path << ": best time is " << best_time.count()
-        << " msec from " << N << " times\n";
+    std::cout << chmm_path << ": best time is " << best_time.count() << " msec from " << N
+              << " times\n";
     return best_time;
 }
 
-
-template<int N, Algorithm_selector SEL>
-void benchmark_with_chmms_in_folder(
-    const std::string& chmm_folder,
-    const HMM::Seq_vec_t& ess)
-{
+template <int N, Algorithm_selector SEL>
+void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::Seq_vec_t& ess) {
     namespace fs = std::experimental::filesystem;
     auto all_time = std::chrono::milliseconds{0};
 
-    std::cout << "\nBenchmarking " << get_algo_descr(SEL)
-        << ", chmms from " << chmm_folder << '\n';
+    std::cout << "\nBenchmarking " << get_algo_descr(SEL) << ", chmms from " << chmm_folder << '\n';
 
     for (const auto& profile : fs::directory_iterator(chmm_folder)) {
         auto path = profile.path();
@@ -102,7 +92,7 @@ void benchmark_with_chmms_in_folder(
         }
     }
 
-    std::cout << get_algo_descr(SEL) << " best times sum: "
-        << all_time.count() << " milliseconds\n\n";
+    std::cout << get_algo_descr(SEL) << " best times sum: " << all_time.count()
+              << " milliseconds\n\n";
     return;
 }

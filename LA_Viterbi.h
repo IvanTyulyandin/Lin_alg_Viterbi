@@ -1,7 +1,7 @@
 #pragma once
 
-#include "HMM.h"
 #include "GraphBLAS_manager.h"
+#include "HMM.h"
 
 class LA_Viterbi {
   public:

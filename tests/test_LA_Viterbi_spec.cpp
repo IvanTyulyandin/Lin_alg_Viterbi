@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-
 int main() {
 
     launch_GraphBLAS();
@@ -20,9 +19,8 @@ int main() {
     auto prob_1 = HMM::Probability_t(0);
     GrB_Matrix_extractElement_FP32(&prob_0, Viterbi_impl.result, 0, 0);
     GrB_Matrix_extractElement_FP32(&prob_1, Viterbi_impl.result, 1, 0);
-    auto is_test_passed =
-        HMM::almost_equal(prob_0, HMM::Probability_t(25.6574)) &&
-        HMM::almost_equal(prob_1, HMM::Probability_t(24.4874));
+    auto is_test_passed = HMM::almost_equal(prob_0, HMM::Probability_t(25.6574)) &&
+                          HMM::almost_equal(prob_1, HMM::Probability_t(24.4874));
     std::cerr << prob_0 << ' ' << prob_1 << '\n';
 
     stop_GraphBLAS();

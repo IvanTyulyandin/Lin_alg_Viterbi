@@ -1,9 +1,8 @@
 #include "data_reader.h"
 
 #include <cmath>
-#include <iostream>
 #include <fstream>
-
+#include <iostream>
 
 // HMM format
 //
@@ -14,7 +13,6 @@
 // N strings with E probabilities
 // T — transitions amount
 // T strings of: "src_state dest_state probability"
-
 
 HMM read_HMM(const std::string& HMM_file_name) {
     auto file = std::ifstream(HMM_file_name);
@@ -73,7 +71,6 @@ HMM read_HMM(const std::string& HMM_file_name) {
     return hmm;
 }
 
-
 // ess format
 // Notes:
 //   sequence[_] can be stored at many lines;
@@ -86,12 +83,10 @@ HMM read_HMM(const std::string& HMM_file_name) {
 // N-1 length(sequence[N-1])
 // sequence[N-1]
 
-
 HMM::Seq_vec_t read_emit_seq(const std::string& emit_seq_file_name) {
     auto file = std::ifstream(emit_seq_file_name);
     if (file.fail()) {
-        std::cerr << "Failed to open file with emitted sequences: "
-            << emit_seq_file_name << '\n';
+        std::cerr << "Failed to open file with emitted sequences: " << emit_seq_file_name << '\n';
         return {};
     }
 
@@ -110,8 +105,8 @@ HMM::Seq_vec_t read_emit_seq(const std::string& emit_seq_file_name) {
         file >> cur_seq_num;
         if (cur_seq_num != i) {
             std::cerr << "Error in .ess file " << emit_seq_file_name
-                << ": expected sequence number is " << i
-                << ", but read " << cur_seq_num << '\n';
+                      << ": expected sequence number is " << i << ", but read " << cur_seq_num
+                      << '\n';
             file.close();
             return {};
         }

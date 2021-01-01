@@ -1,10 +1,6 @@
 #include "LA_Viterbi.h"
 
-
-LA_Viterbi::LA_Viterbi() {
-    result = GrB_Matrix();
-}
-
+LA_Viterbi::LA_Viterbi() { result = GrB_Matrix(); }
 
 void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
     // Define GraphBLAS matrices
@@ -21,10 +17,8 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
         from_0_to_n_ind[i] = i;
     }
 
-    info = GrB_Matrix_build_FP32(result,
-        from_0_to_n_ind.data(), n_zeroes_ind.data(), hmm.start_probabilities.data(),
-        hmm.states_num,
-        GrB_FIRST_FP32);
+    info = GrB_Matrix_build_FP32(result, from_0_to_n_ind.data(), n_zeroes_ind.data(),
+                                 hmm.start_probabilities.data(), hmm.states_num, GrB_FIRST_FP32);
     check_for_error(info);
 
     // Emission probabilities matrices
@@ -43,11 +37,8 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
             offset += hmm.emit_num;
         }
 
-        info = GrB_Matrix_build_FP32(
-            m,
-            from_0_to_n_ind.data(), from_0_to_n_ind.data(), emit_data.data(),
-            hmm.states_num,
-            GrB_FIRST_FP32);
+        info = GrB_Matrix_build_FP32(m, from_0_to_n_ind.data(), from_0_to_n_ind.data(),
+                                     emit_data.data(), hmm.states_num, GrB_FIRST_FP32);
         check_for_error(info);
     }
 
@@ -57,11 +48,8 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
     info = GrB_Matrix_new(&transitions, GrB_FP32, hmm.states_num, hmm.states_num);
     check_for_error(info);
 
-    info = GrB_Matrix_build_FP32(
-        transitions,
-        hmm.trans_rows.data(),hmm.trans_cols.data(), hmm.trans_probs.data(),
-        hmm.trans_num,
-        GrB_FIRST_FP32);
+    info = GrB_Matrix_build_FP32(transitions, hmm.trans_rows.data(), hmm.trans_cols.data(),
+                                 hmm.trans_probs.data(), hmm.trans_num, GrB_FIRST_FP32);
     check_for_error(info);
 
     auto prob_x_trans = GrB_Matrix();
@@ -75,23 +63,20 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
     // Viterbi algorithm
 
     // Count emissions for first symbol and start probabilities
-    info = GrB_mxm(
-        next_probabilites, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
-        em_probs[seq[0]], result, GrB_NULL);
+    info = GrB_mxm(next_probabilites, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
+                   em_probs[seq[0]], result, GrB_NULL);
     check_for_error(info);
     GrB_Matrix_wait(&next_probabilites);
     std::swap(result, next_probabilites);
 
     for (size_t i = 1; i < seq.size(); ++i) {
-        info = GrB_mxm(
-            prob_x_trans, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
-            em_probs[seq[i]], transitions, GrB_NULL);
+        info = GrB_mxm(prob_x_trans, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
+                       em_probs[seq[i]], transitions, GrB_NULL);
         check_for_error(info);
         GrB_Matrix_wait(&prob_x_trans);
 
-        info = GrB_mxm(
-            next_probabilites, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
-            prob_x_trans, result, GrB_NULL);
+        info = GrB_mxm(next_probabilites, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
+                       prob_x_trans, result, GrB_NULL);
         check_for_error(info);
         GrB_Matrix_wait(&next_probabilites);
 
@@ -116,7 +101,4 @@ void LA_Viterbi::run_Viterbi(HMM& hmm, const HMM::Emit_vec_t& seq) {
     return;
 }
 
-
-LA_Viterbi::~LA_Viterbi() {
-    GrB_Matrix_free(&result);
-}
+LA_Viterbi::~LA_Viterbi() { GrB_Matrix_free(&result); }

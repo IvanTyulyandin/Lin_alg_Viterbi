@@ -29,12 +29,10 @@ class HMM {
         return std::fabs(x - y) <= 0.0001;
     }
 
-    static HMM::Probability_t to_neg_log(HMM::Probability_t x) {
-        return -1 * std::log2(x);
-    }
+    static HMM::Probability_t to_neg_log(HMM::Probability_t x) { return -1 * std::log2(x); }
 
     void transpose_transitions() {
-        if (! is_transition_transposed) {
+        if (!is_transition_transposed) {
             is_transition_transposed = true;
             trans_rows.swap(trans_cols);
         }

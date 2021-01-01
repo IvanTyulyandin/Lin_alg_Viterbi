@@ -3,7 +3,6 @@
 #include "data_reader.h"
 #include <iostream>
 
-
 LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
     auto hmm = read_HMM(chmm_file_path);
     states_num = hmm.states_num;
@@ -18,11 +17,8 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
     info = GrB_Matrix_new(&transitions, GrB_FP32, states_num, states_num);
     check_for_error(info);
 
-    info = GrB_Matrix_build_FP32(
-        transitions,
-        hmm.trans_rows.data(),hmm.trans_cols.data(), hmm.trans_probs.data(),
-        hmm.trans_num,
-        GrB_FIRST_FP32);
+    info = GrB_Matrix_build_FP32(transitions, hmm.trans_rows.data(), hmm.trans_cols.data(),
+                                 hmm.trans_probs.data(), hmm.trans_num, GrB_FIRST_FP32);
     check_for_error(info);
 
     // Read info about states with
@@ -36,20 +32,16 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
 
     auto start_probs = GrB_Matrix();
     info = GrB_Matrix_new(&start_probs, GrB_FP32, states_num, 1);
-    info = GrB_Matrix_build_FP32(start_probs,
-        from_0_to_n_ind.data(), n_zeroes_ind.data(), hmm.start_probabilities.data(),
-        hmm.states_num,
-        GrB_FIRST_FP32);
+    info = GrB_Matrix_build_FP32(start_probs, from_0_to_n_ind.data(), n_zeroes_ind.data(),
+                                 hmm.start_probabilities.data(), hmm.states_num, GrB_FIRST_FP32);
     check_for_error(info);
 
     emit_pr_x_start_pr = std::vector<GrB_Matrix>(hmm.emit_num);
     emit_pr_x_trans_pr = std::vector<GrB_Matrix>(hmm.emit_num);
     for (size_t i = 0; i < hmm.emit_num; ++i) {
-        info = GrB_Matrix_new(
-            &(emit_pr_x_start_pr[i]), GrB_FP32, states_num, 1);
+        info = GrB_Matrix_new(&(emit_pr_x_start_pr[i]), GrB_FP32, states_num, 1);
         check_for_error(info);
-        info = GrB_Matrix_new(
-            &(emit_pr_x_trans_pr[i]), GrB_FP32, states_num, states_num);
+        info = GrB_Matrix_new(&(emit_pr_x_trans_pr[i]), GrB_FP32, states_num, states_num);
         check_for_error(info);
     }
 
@@ -65,21 +57,17 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
             offset += hmm.emit_num;
         }
 
-        info = GrB_Matrix_build_FP32(
-            emit_probs_diag_mat,
-            from_0_to_n_ind.data(), from_0_to_n_ind.data(), emit_data.data(),
-            hmm.states_num,
-            GrB_FIRST_FP32);
+        info = GrB_Matrix_build_FP32(emit_probs_diag_mat, from_0_to_n_ind.data(),
+                                     from_0_to_n_ind.data(), emit_data.data(), hmm.states_num,
+                                     GrB_FIRST_FP32);
         check_for_error(info);
 
-        info = GrB_mxm(
-            emit_pr_x_start_pr[i], GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
-            emit_probs_diag_mat, start_probs, GrB_NULL);
+        info = GrB_mxm(emit_pr_x_start_pr[i], GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
+                       emit_probs_diag_mat, start_probs, GrB_NULL);
         check_for_error(info);
 
-        info = GrB_mxm(
-            emit_pr_x_trans_pr[i], GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
-            emit_probs_diag_mat, transitions, GrB_NULL);
+        info = GrB_mxm(emit_pr_x_trans_pr[i], GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
+                       emit_probs_diag_mat, transitions, GrB_NULL);
         check_for_error(info);
 
         info = GrB_Matrix_clear(emit_probs_diag_mat);
@@ -90,7 +78,6 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
     GrB_Matrix_free(&start_probs);
     GrB_Matrix_free(&emit_probs_diag_mat);
 }
-
 
 void LA_Viterbi_spec::run_Viterbi_spec(const HMM::Emit_vec_t& seq) {
     // Clear previous stored result
@@ -106,9 +93,8 @@ void LA_Viterbi_spec::run_Viterbi_spec(const HMM::Emit_vec_t& seq) {
 
     // Viterbi algorithm for the rest of seq
     for (size_t i = 1; i < seq.size(); ++i) {
-        info = GrB_mxm(
-            next_probs, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
-            emit_pr_x_trans_pr[seq[i]], result, GrB_NULL);
+        info = GrB_mxm(next_probs, GrB_NULL, GrB_NULL, GrB_MIN_PLUS_SEMIRING_FP32,
+                       emit_pr_x_trans_pr[seq[i]], result, GrB_NULL);
         check_for_error(info);
         GrB_Matrix_wait(&next_probs);
         std::swap(next_probs, result);
@@ -119,13 +105,12 @@ void LA_Viterbi_spec::run_Viterbi_spec(const HMM::Emit_vec_t& seq) {
     return;
 }
 
-
 LA_Viterbi_spec::~LA_Viterbi_spec() {
     // Free internal matrices
-    for (auto& m: emit_pr_x_trans_pr) {
+    for (auto& m : emit_pr_x_trans_pr) {
         GrB_Matrix_free(&m);
     }
-    for (auto& m: emit_pr_x_start_pr) {
+    for (auto& m : emit_pr_x_start_pr) {
         GrB_Matrix_free(&m);
     }
     GrB_Matrix_free(&result);
