@@ -22,7 +22,7 @@ int main() {
 
     for (const auto& profile : fs::directory_iterator(chmm_folder)) {
 
-        auto path = profile.path();
+        const auto& path = profile.path();
         auto chmm_name = path.filename().string();
 
         // Check if file has chmm format and is not "test_chmm.chmm"

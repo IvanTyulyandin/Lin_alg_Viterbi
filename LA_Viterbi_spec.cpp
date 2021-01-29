@@ -32,6 +32,7 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
 
     auto start_probs = GrB_Matrix();
     info = GrB_Matrix_new(&start_probs, GrB_FP32, states_num, 1);
+    check_for_error(info);
     info = GrB_Matrix_build_FP32(start_probs, from_0_to_n_ind.data(), n_zeroes_ind.data(),
                                  hmm.start_probabilities.data(), hmm.states_num, GrB_FIRST_FP32);
     check_for_error(info);
@@ -48,6 +49,7 @@ LA_Viterbi_spec::LA_Viterbi_spec(const std::string& chmm_file_path) {
     auto emit_data = HMM::Prob_vec_t(states_num);
     auto emit_probs_diag_mat = GrB_Matrix();
     info = GrB_Matrix_new(&emit_probs_diag_mat, GrB_FP32, states_num, states_num);
+    check_for_error(info);
 
     for (size_t i = 0; i < hmm.emit_num; ++i) {
 
@@ -90,6 +92,7 @@ void LA_Viterbi_spec::run_Viterbi_spec(const HMM::Emit_vec_t& seq) {
 
     auto next_probs = GrB_Matrix();
     info = GrB_Matrix_new(&next_probs, GrB_FP32, states_num, 1);
+    check_for_error(info);
 
     // Viterbi algorithm for the rest of seq
     for (size_t i = 1; i < seq.size(); ++i) {

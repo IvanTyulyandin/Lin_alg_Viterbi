@@ -23,7 +23,7 @@ constexpr std::string_view get_algo_descr(Algorithm_selector alg_sel) {
 
 template <int N>
 std::chrono::milliseconds benchmark_spec_N_times(const std::string& chmm_path,
-                                                 const HMM::Seq_vec_t ess) {
+                                                 const HMM::Seq_vec_t& ess) {
     auto best_time = std::chrono::milliseconds::max();
 
     auto spec_impl = LA_Viterbi_spec(chmm_path);
@@ -48,7 +48,7 @@ std::chrono::milliseconds benchmark_spec_N_times(const std::string& chmm_path,
 
 template <int N>
 std::chrono::milliseconds benchmark_non_spec_N_times(const std::string& chmm_path,
-                                                     const HMM::Seq_vec_t ess) {
+                                                     const HMM::Seq_vec_t& ess) {
     auto best_time = std::chrono::milliseconds::max();
 
     auto hmm = read_HMM(chmm_path);
@@ -80,7 +80,7 @@ void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::S
     std::cout << "\nBenchmarking " << get_algo_descr(SEL) << ", chmms from " << chmm_folder << '\n';
 
     for (const auto& profile : fs::directory_iterator(chmm_folder)) {
-        auto path = profile.path();
+        const auto& path = profile.path();
         auto chmm_name = path.filename().string();
         // Check if file has chmm format and is not "test_chmm.chmm"
         if ((path.extension() == ".chmm") && (chmm_name != "test_chmm.chmm")) {
