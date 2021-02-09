@@ -2,10 +2,12 @@
 
 #include <iostream>
 
-void check_for_error(const GrB_Info& info) {
+void check_for_error([[maybe_unused]] const GrB_Info& info) {
+#ifndef NDEBUG
     if (!(info == GrB_Info::GrB_SUCCESS || info == GrB_Info::GrB_NO_VALUE)) {
         printf("info: %d error: %s\n", info, GrB_error());
     }
+#endif
 }
 
 // Init GraphBLAS
