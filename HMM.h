@@ -13,6 +13,16 @@ class HMM {
     using Emit_vec_t = std::vector<Emit_t>;
     using Seq_vec_t = std::vector<Emit_vec_t>;
 
+    struct Emit_vec_hasher {
+        std::size_t operator()(const HMM::Emit_vec_t& vec) const {
+            auto seed = vec.size();
+            for (auto& i : vec) {
+                seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            }
+            return seed;
+        }
+    };
+
     Index_t states_num;
     Index_t emit_num;
     Index_t trans_num;

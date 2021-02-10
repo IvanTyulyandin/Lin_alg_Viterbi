@@ -24,6 +24,11 @@ target_link_libraries(test_LA_Viterbi_spec LA_Viterbi)
 
 add_test(test_LA_Viterbi_spec test_LA_Viterbi_spec)
 
+add_executable(test_LA_Viterbi_assoc_spec test_LA_Viterbi_assoc_spec.cpp)
+target_link_libraries(test_LA_Viterbi_assoc_spec LA_Viterbi)
+
+add_test(test_LA_Viterbi_assoc_spec test_LA_Viterbi_assoc_spec)
+
 add_executable(test_semantic_equality test_semantic_equality.cpp)
 target_link_libraries(test_semantic_equality LA_Viterbi stdc++fs)
 
