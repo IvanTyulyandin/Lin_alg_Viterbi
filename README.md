@@ -13,9 +13,15 @@ The script `build.sh` is available and can be used as a building guide.
 
 ## Implementations
 
-There are two versions: default and specialized.
-First one is at files `LA_Viterbi.h` and `LA_Viterbi.cpp`.
-Second one is at `LA_Viterbi_spec.h` and `LA_Viterbi_spec.cpp` accordingly.
+There are implementations of the Viterbi algorithm in terms of linear algebra:
+
+1. Default: `LA_Viterbi.h` and `LA_Viterbi.cpp`.
+2. Specialized: `LA_Viterbi_spec.h` and `LA_Viterbi_spec.cpp`
+3. Specialized: `LA_Viterbi_assoc_spec.h` and `LA_Viterbi_assoc_spec.cpp`
+
+The second version precalculates matrix multipications only for one observation.
+The third one is an updated version of the second.
+Since Min_plus semiring is associative, observation matrices can be combined and precalculated.
 
 ## Testing
 
