@@ -14,6 +14,9 @@ int main() {
 
     benchmark_with_chmms_in_folder<TIMES_TO_RUN, Algorithm_selector::LA_spec>(file_with_chmms, ess);
 
+    benchmark_with_chmms_in_folder<TIMES_TO_RUN, Algorithm_selector::LA_assoc_spec>(file_with_chmms,
+                                                                                    ess);
+
     stop_GraphBLAS();
 
     return 0;
