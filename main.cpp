@@ -24,7 +24,7 @@ int main() {
     launch_GraphBLAS();
 
     auto ess_files = std::vector{"./ess_files/emit_3_3500_20.ess", "./ess_files/emit_3_7000_20.ess",
-                                 "./ess_files/covd-19.ess"};
+                                 "./ess_files/covid-19.ess"};
 
     for (auto ess_file : ess_files) {
         std::cout << "----------------------------\n"

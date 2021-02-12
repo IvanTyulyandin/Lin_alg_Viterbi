@@ -3,7 +3,9 @@ import sys
 amino2num = {'A': '0', 'C': '1', 'D': '2', 'E': '3', 'F': '4',
              'G': '5', 'H': '6', 'I': '7', 'K': '8', 'L': '9',
              'M': '10', 'N': '11', 'P': '12', 'Q': '13', 'R': '14',
-             'S': '15', 'T': '16', 'V': '17', 'W': '18', 'Y': '19'}
+             'S': '15', 'T': '16', 'V': '17', 'W': '18', 'Y': '19',
+             'X': '0'}
+# X can be transformed into any aminoacid
 
 for fasta_file in sys.argv[1:]:
     slash_index: int = fasta_file.rfind('/')
