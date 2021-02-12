@@ -6,18 +6,18 @@
 #include <any>
 #include <chrono>
 #include <experimental/filesystem>
+#include <functional>
 #include <iostream>
 
-enum class Algorithm_selector { LA, LA_spec, LA_assoc_spec };
-constexpr size_t ASSOC_LEVEL = 2;
+enum class Algo_selector { LA, LA_spec, LA_assoc_spec };
 
 namespace {
-constexpr std::string_view get_algo_descr(Algorithm_selector alg_sel) {
-    if (alg_sel == Algorithm_selector::LA) {
+constexpr std::string_view get_algo_descr(Algo_selector alg_sel) {
+    if (alg_sel == Algo_selector::LA) {
         return "non-specialized version";
-    } else if (alg_sel == Algorithm_selector::LA_spec) {
+    } else if (alg_sel == Algo_selector::LA_spec) {
         return "specialized version";
-    } else if (alg_sel == Algorithm_selector::LA_assoc_spec) {
+    } else if (alg_sel == Algo_selector::LA_assoc_spec) {
         return "associative specialized version";
     } else {
         return "Error! Unknown Algorithm_selector";
@@ -26,20 +26,13 @@ constexpr std::string_view get_algo_descr(Algorithm_selector alg_sel) {
 } // namespace
 
 template <int N>
-std::chrono::milliseconds benchmark_non_spec_N_times(const std::string& chmm_path,
-                                                     const HMM::Seq_vec_t& ess) {
+std::chrono::milliseconds benchmark_N_times(const std::function<void(void)>& func,
+                                            const std::string& chmm_path) {
     auto best_time = std::chrono::milliseconds::max();
-
-    auto hmm = read_HMM(chmm_path);
-    auto non_spec_impl = LA_Viterbi();
 
     for (size_t i = 0; i < N; ++i) {
         auto iteration_start_time = std::chrono::steady_clock::now();
-
-        for (const auto& seq : ess) {
-            non_spec_impl.run_Viterbi(hmm, seq);
-        }
-
+        func();
         auto cur_time = std::chrono::steady_clock::now();
         auto duration =
             std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
@@ -51,58 +44,7 @@ std::chrono::milliseconds benchmark_non_spec_N_times(const std::string& chmm_pat
     return best_time;
 }
 
-template <int N>
-std::chrono::milliseconds benchmark_spec_N_times(const std::string& chmm_path,
-                                                 const HMM::Seq_vec_t& ess) {
-    auto best_time = std::chrono::milliseconds::max();
-
-    auto spec_impl = LA_Viterbi_spec(chmm_path);
-
-    for (size_t i = 0; i < N; ++i) {
-        auto iteration_start_time = std::chrono::steady_clock::now();
-
-        for (const auto& seq : ess) {
-            spec_impl.run_Viterbi_spec(seq);
-        }
-
-        auto cur_time = std::chrono::steady_clock::now();
-        auto duration =
-            std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
-        best_time = std::min(best_time, duration);
-    }
-
-    std::cout << chmm_path << ": best time is " << best_time.count() << " msec from " << N
-              << " times\n";
-    return best_time;
-}
-
-template <int N>
-std::chrono::milliseconds benchmark_assoc_spec_N_times(const std::string& chmm_path,
-                                                       const HMM::Seq_vec_t& ess,
-                                                       const size_t level) {
-    auto best_time = std::chrono::milliseconds::max();
-
-    auto spec_impl = LA_Viterbi_assoc_spec(chmm_path, level);
-
-    for (size_t i = 0; i < N; ++i) {
-        auto iteration_start_time = std::chrono::steady_clock::now();
-
-        for (const auto& seq : ess) {
-            spec_impl.run_Viterbi_assoc_spec(seq);
-        }
-
-        auto cur_time = std::chrono::steady_clock::now();
-        auto duration =
-            std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
-        best_time = std::min(best_time, duration);
-    }
-
-    std::cout << chmm_path << ": best time is " << best_time.count() << " msec from " << N
-              << " times\n";
-    return best_time;
-}
-
-template <int N, Algorithm_selector SEL>
+template <int N, Algo_selector SEL, int ASSOC_LEVEL = 1>
 void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::Seq_vec_t& ess) {
     namespace fs = std::experimental::filesystem;
     auto all_time = std::chrono::milliseconds{0};
@@ -114,16 +56,54 @@ void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::S
         auto chmm_name = path.filename().string();
         // Check if file has chmm format and is not "test_chmm.chmm"
         if ((path.extension() == ".chmm") && (chmm_name != "test_chmm.chmm")) {
-            if (SEL == Algorithm_selector::LA) {
-                all_time += benchmark_non_spec_N_times<N>(path.string(), ess);
-            } else if (SEL == Algorithm_selector::LA_spec) {
-                all_time += benchmark_spec_N_times<N>(path.string(), ess);
-            } else if (SEL == Algorithm_selector::LA_assoc_spec) {
-                all_time += benchmark_assoc_spec_N_times<N>(path.string(), ess, ASSOC_LEVEL);
+            if (SEL == Algo_selector::LA) {
+                auto hmm = read_HMM(path.string());
+                auto non_spec_impl = LA_Viterbi();
+
+                auto non_spec = [&hmm, &ess, &non_spec_impl]() {
+                    for (const auto& seq : ess) {
+                        non_spec_impl.run_Viterbi(hmm, seq);
+                    }
+                };
+                all_time += benchmark_N_times<N>(non_spec, chmm_name);
+
+            } else if (SEL == Algo_selector::LA_spec) {
+                auto iteration_start_time = std::chrono::steady_clock::now();
+                auto spec_impl = LA_Viterbi_spec(path.string());
+                auto cur_time = std::chrono::steady_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    cur_time - iteration_start_time);
+                std::cout << "Spec time is " << duration.count() << '\n';
+                all_time += duration;
+
+                auto spec = [&ess, &spec_impl]() {
+                    for (const auto& seq : ess) {
+                        spec_impl.run_Viterbi_spec(seq);
+                    }
+                };
+                all_time += benchmark_N_times<N>(spec, chmm_name);
+
+            } else if (SEL == Algo_selector::LA_assoc_spec) {
+                auto iteration_start_time = std::chrono::steady_clock::now();
+                auto spec_assoc_impl = LA_Viterbi_assoc_spec(path.string(), ASSOC_LEVEL);
+                auto cur_time = std::chrono::steady_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    cur_time - iteration_start_time);
+                std::cout << "Spec time is " << duration.count() << '\n';
+                all_time += duration;
+
+                auto spec_assoc = [&ess, &spec_assoc_impl]() {
+                    for (const auto& seq : ess) {
+                        spec_assoc_impl.run_Viterbi_assoc_spec(seq);
+                    }
+                };
+                all_time += benchmark_N_times<N>(spec_assoc, chmm_name);
             }
         }
     }
-
+    if (ASSOC_LEVEL > 1) {
+        std::cout << ASSOC_LEVEL << ' ';
+    }
     std::cout << get_algo_descr(SEL) << " best times sum: " << all_time.count()
               << " milliseconds\n\n";
     return;
