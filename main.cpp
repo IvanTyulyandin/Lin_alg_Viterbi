@@ -1,7 +1,7 @@
 #include "benchmark_helper.h"
 #include <iostream>
 
-constexpr int TIMES_TO_RUN = 3;
+constexpr int TIMES_TO_RUN = 100;
 
 void run_benchmark(const std::string& file_with_chmms, const HMM::Seq_vec_t& ess) {
 
@@ -13,9 +13,6 @@ void run_benchmark(const std::string& file_with_chmms, const HMM::Seq_vec_t& ess
                                                                                   ess);
 
     benchmark_with_chmms_in_folder<TIMES_TO_RUN, Algo_selector::LA_assoc_spec, 3>(file_with_chmms,
-                                                                                  ess);
-
-    benchmark_with_chmms_in_folder<TIMES_TO_RUN, Algo_selector::LA_assoc_spec, 4>(file_with_chmms,
                                                                                   ess);
 }
 

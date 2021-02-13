@@ -3,7 +3,9 @@
 #include "LA_Viterbi_spec.h"
 #include "data_reader.h"
 
+#include <algorithm>
 #include <any>
+#include <array>
 #include <chrono>
 #include <experimental/filesystem>
 #include <functional>
@@ -25,10 +27,15 @@ constexpr std::string_view get_algo_descr(Algo_selector alg_sel) {
 }
 } // namespace
 
-template <int N>
-std::chrono::milliseconds benchmark_N_times(const std::function<void(void)>& func,
-                                            const std::string& chmm_path) {
-    auto best_time = std::chrono::milliseconds::max();
+template <size_t N>
+std::chrono::milliseconds get_median(const std::function<void(void)>& func,
+                                     const std::string& chmm_path) {
+    // To prevent out-of-bounds while counting median
+    static_assert(N > 1);
+
+    auto results = std::array<std::chrono::milliseconds, N>();
+
+    std::cout << chmm_path << '\n';
 
     for (size_t i = 0; i < N; ++i) {
         auto iteration_start_time = std::chrono::steady_clock::now();
@@ -36,12 +43,22 @@ std::chrono::milliseconds benchmark_N_times(const std::function<void(void)>& fun
         auto cur_time = std::chrono::steady_clock::now();
         auto duration =
             std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - iteration_start_time);
-        best_time = std::min(best_time, duration);
+        results[i] = duration;
+        std::cout << duration.count() << ' ';
     }
 
-    std::cout << chmm_path << ": best time is " << best_time.count() << " msec from " << N
-              << " times\n";
-    return best_time;
+    auto median = std::chrono::milliseconds(0);
+    auto mid = results.size() / 2;
+    std::sort(results.begin(), results.end());
+
+    if (N % 2) {
+        median = results[mid];
+    } else {
+        median = (results[mid] + results[mid + 1]) / 2;
+    }
+
+    std::cout << "\nMedian is " << median.count() << " msec from " << N << " times\n";
+    return median;
 }
 
 template <int N, Algo_selector SEL, int ASSOC_LEVEL = 1>
@@ -65,7 +82,7 @@ void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::S
                         non_spec_impl.run_Viterbi(hmm, seq);
                     }
                 };
-                all_time += benchmark_N_times<N>(non_spec, chmm_name);
+                all_time += get_median<N>(non_spec, chmm_name);
 
             } else if (SEL == Algo_selector::LA_spec) {
                 auto iteration_start_time = std::chrono::steady_clock::now();
@@ -81,7 +98,7 @@ void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::S
                         spec_impl.run_Viterbi_spec(seq);
                     }
                 };
-                all_time += benchmark_N_times<N>(spec, chmm_name);
+                all_time += get_median<N>(spec, chmm_name);
 
             } else if (SEL == Algo_selector::LA_assoc_spec) {
                 auto iteration_start_time = std::chrono::steady_clock::now();
@@ -97,7 +114,7 @@ void benchmark_with_chmms_in_folder(const std::string& chmm_folder, const HMM::S
                         spec_assoc_impl.run_Viterbi_assoc_spec(seq);
                     }
                 };
-                all_time += benchmark_N_times<N>(spec_assoc, chmm_name);
+                all_time += get_median<N>(spec_assoc, chmm_name);
             }
         }
     }
